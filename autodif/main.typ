@@ -47,15 +47,33 @@ TODO: tabulka s porovnáním + vysvětlení proč
 
 = Automatic differentiation method
 
-TODO: že existují dvě varianty, začneme dopřednou a pak uvidíme jak se to vyvine
+TODO: že existují dvě varianty, začneme tím, co mají společného
 
-== Intuitive introduction to autodiff
+== Fundamental concepts
 
-TODO: jak a proč autodif funguje
+TODO: proč to funguje, teorie za tím
 
-== Formal explanation
+TODO: chain rule, výpočetní graf, potřeba mít známé funkce a jejich derivace
 
-TODO: proč to funguje, teorie za tím, výpočetní graf
+TODO: "jediný" rozdíl mezi FM/BM je pořadí derivací v chain rule - dá se
+vysvětlit i jako pořadí násobení jakobiánů
+
+== Forward mode: The tangent linear mode
+
+TODO: důležitý je "přenášení" derivací spolu s hodnotou ve výpočtu
+
+TODO: duální čísla #sym.epsilon^2 = 0 jako další matematický pohled na věc
+
+TODO: vhodné pro málo vstupů, hodně výstupů - pro každý vstup třeba další
+průchod
+
+== Backward mode: The adjoint mode
+
+TODO: potřeba dva průchody - první k vytvoření výpočetního grafu a zpětný k
+tomu, abychom viděli jak který vstup kontributuje k výsledné hodnotě (kterou si
+zvolíme) -> víc paměti. taky VJP (vector jacobian product) - a na tom ukázat,
+že je vhodné pro mnoho vstupů a málo výstupů (vs forward mode)
+
 
 == Computional complexity
 
@@ -63,18 +81,18 @@ TODO: časová a paměťová komplexita, porovnání s ostatními metodami
 
 = Minimal implementation
 
-TODO: jak dát do kódu, python - informatici ohrnou nos, ale pochopí většina
-faváků
+TODO: jak dát do kódu, python - fundamentální rozdíl mezi FMode a BM
 
 == Forward mode
 
-TODO: + vysvětlení duálních čísel??
+TODO: + vysvětlení pomocí duálních čísel, přetížení standardních algebraických
+operací tak, aby se přenášela i derivace
 
 == Backward mode
 
 TODO: + vysvětlení jak se používá computational graf k zpětnému chodu
 
-= Using existing autodif libraries
+= Using existing autodif libraries in python
 
 TODO: předpokládám python + pytorch, tensorFlow
 
