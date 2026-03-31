@@ -45,11 +45,11 @@ TODO: co je symbolická metoda, jak funguje, plusy a minusy
 
 TODO: tabulka s porovnáním + vysvětlení proč
 
-= Automatic differentiation method
+= Automatic differentiation
 
 TODO: že existují dvě varianty, začneme tím, co mají společného
 
-== Fundamental concepts
+== Core principles
 
 TODO: proč to funguje, teorie za tím
 
@@ -75,7 +75,7 @@ zvolíme) -> víc paměti. taky VJP (vector jacobian product) - a na tom ukázat
 že je vhodné pro mnoho vstupů a málo výstupů (vs forward mode)
 
 
-== Computional complexity
+== Computational complexity
 
 TODO: časová a paměťová komplexita, porovnání s ostatními metodami
 
