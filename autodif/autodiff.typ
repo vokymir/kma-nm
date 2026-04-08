@@ -21,8 +21,53 @@
 
 = Introduction
 
-TODO: co je to za problém ta derivace, diferenciace, motivačně kde všude se hodí
-a proč, jak se počítá ručně
+Derivative is an indispensable tool in almost any field of mathematics. Its
+useful property lies in revealing the rate of change of any function. The
+process of differentiation is very simple, therefore presumably easily encoded
+into computer program. From the birth of machine computing various methods vere
+discovered, all with their respective drawbacks. We will explore these methods
+later. It is necessary to understand the foundational challenges and
+inner-workings of differentiation first.
+
+Derivative may be defined as a limit, such as
+$
+L = lim_(h arrow 0)( f(a + h) - f(a) ) / h
+$
+where $f(x)$ is differentiable on an open interval containing point $a$, and if
+the limit $L$ exists. In principle, the derivative of any function (if exists)
+may be computed using this definition. However, since was discovered different
+approach. When a few simple functions have known derivatives, using them with a
+set of rules for obtaining derivatives of more complicated functions results in
+a different, simpler method. The process of finding a derivative is called
+differentiation.
+
+For example, if we know the derivative of a polynomial
+$
+(x^a)' = a x^(a-1)
+$
+where $a$ is an arbitrary integer, and a sum rule
+$
+(alpha f + beta g)' = alpha f' + beta g'
+$
+for any function $f$, $g$, and all real numbers $alpha$, $beta$, we may obtain
+derivative for this function:
+$
+f(x) = 3x^2 + 5x
+$
+Using both the rules its apparent the result will be:
+$
+f(x)' = 6x + 5
+$
+This simple example demonstrated, that with as little as one known derivative
+and one rule, we are able to differentiate a whole class of functions,
+polynomials.
+
+If we add to our set of known derivatives and rules, we are quickly able to
+differentiate any known function. With large enough set it is only matter of
+mechanicaly applying rules and known derivatives in the correct order. Something
+a computer is supposedly very good at, or at least less error-prone than most
+humans.
+
 
 = Background
 
