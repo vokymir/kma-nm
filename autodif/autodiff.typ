@@ -139,14 +139,21 @@ numbers is prone to errors.
 
 The great issue arises as the requirement on precision increases. For simplicity
 we will define our own data type, which has the same drawbacks as `float` but is
-easier to understand for humans. We will call it FD2 as _floating decimal 2_,
+easier to understand for humans. We will call it `FD2` as _floating decimal 2_,
 because it is normal arithmetic with precision up to two numbers.
 
 If we tried to calculate derivative for $f(x) = x$, $a = 100$ and $h = 0.01$
 $
-f(x)' &= ( f(100 + 0.01) - f(100) ) / 0.01 \
-f(x)' &= 
+f(x)' = ( f(100 + 0.01) - f(100) ) / 0.01 \
 $
+we would encounter first error when summing $100 + 0.01 = 100.01$. Due to `FD2`
+precision, it is trimmed to $100$. Next, the function $f$ is identity:
+$
+f(x)' &= (100 - 100) / 0.01 \
+f(x)' &= 0
+$
+So, numerically we get the result of derivation to be $0$, but we know that
+derivation of linear function is $1$.
 
 
 
