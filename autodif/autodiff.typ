@@ -19,6 +19,36 @@
   figure-supplement: [Fig.],
 )
 
+#show ref: it => {
+  let el = it.element
+
+  if el == none {
+    return it
+  } 
+
+  let loc = it.element.location()
+  let page = loc.page()
+
+  if el.func() == heading {
+
+    return link(
+    loc,
+    [_#el.body (page #page)_]
+    )
+  } 
+
+  if el.func() == math.equation {
+
+    return link(
+    loc,
+    [_Equation #el.numbering at page #(page)_]
+    )
+  }
+
+  it
+}
+
+
 = Introduction
 
 Derivative is an indispensable tool in almost any field of mathematics. Its
@@ -32,7 +62,7 @@ inner-workings of differentiation first.
 Derivative may be defined as a limit, such as
 $
 L = lim_(h arrow 0)( f(a + h) - f(a) ) / h
-$
+$ <eq:derivative>
 where $f(x)$ is differentiable on an open interval containing point $a$, and if
 the limit $L$ exists. In principle, the derivative of any function (if exists)
 may be computed using this definition. However, since was discovered different
@@ -68,19 +98,57 @@ mechanicaly applying rules and known derivatives in the correct order. Something
 a computer is supposedly very good at, or at least less error-prone than most
 humans.
 
+The most powerful property of computer is the `if-else` branching logic. Another
+important part is the ability to perform sequential instructions. This trait
+might be easily exploitable in order to create a computer program which would
+take any function as an input and produce its derivative as output.
 
-= Background
-
-TODO: proč se na to hodí použít počítač, fundamentální problém (zdrojový kód
-přesně nekopíruje matematické funkce), možná zase motivace
+Most often the function we need to differentiate is in the form 
+$
+f: RR^n arrow RR^m
+$
+where $n$ and $m$ are any positive integers. It might be useful to calculate its
+partial derivatives or the Jacobian matrix. For some tasks it might be
+sufficient to only calculate only one partial derivative, a row or column of
+derivatives.
 
 = Alternative differentiation methods
 
-TODO: že existují nějaký další metody, na něco se hodí možná
+Automatic differentiation was not the first method for finding derivatives
+utilizing computer. In fact it is conceptually more complex than the previous
+methods.
+
+That is not to say the _older_ methods are inherently worse because they were
+discovered sooner or that are less complex. Every method is useful in particular
+scenario, however it is important to know about all of them and their advantages
+and weaknesses.
 
 == Finite difference method
 
-TODO: co je FD (finite difference) metoda, jak funguje, plusy a minusy
+This method is based on the @eq:derivative. The assumption is, that with a
+small-enough $h$, the error will be negligible. It is not an analytical, a
+precise method, rather a numerical tool for obtaining _good-enough_ derivative.
+This method doesn't take advantage of computers properties. It only uses the
+machine as a mere calculator. 
+
+Humans represent numbers most often using a arabic numerals. Computers represent
+and store numbers in different formats. When working with non-integers a
+floating point arithmetic was introduced, and later standardized @IEEE754. This
+format has limited precision and for very big or very small (near to zero)
+numbers is prone to errors.
+
+The great issue arises as the requirement on precision increases. For simplicity
+we will define our own data type, which has the same drawbacks as `float` but is
+easier to understand for humans. We will call it FD2 as _floating decimal 2_,
+because it is normal arithmetic with precision up to two numbers.
+
+If we tried to calculate derivative for $f(x) = x$, $a = 100$ and $h = 0.01$
+$
+f(x)' &= ( f(100 + 0.01) - f(100) ) / 0.01 \
+f(x)' &= 
+$
+
+
 
 == Symbolic method
 
