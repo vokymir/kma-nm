@@ -354,7 +354,7 @@ Let us build a computational graph for the very same example function from
     node-shape: circle,
     node-fill: none,
     node-stroke: 1pt + black.transparentize(60%),
-    spacing: (30pt, 15pt),
+    spacing: (25pt, 15pt),
     let text-size = 8pt,
 
     let my-node(pos, name, id, ..args) = {
@@ -369,6 +369,23 @@ Let us build a computational graph for the very same example function from
       )
     },
 
+    let my-edge = edge.with(marks: "->"),
+
+    let my-label(origin-pos, name, id, ..args) = {
+      let up = (0, -0.58)
+      let pos = (origin-pos.at(0) + up.at(0), origin-pos.at(1) + up.at(1))
+
+      node(
+        pos,
+        text(text-size, name),
+        name: id,
+        stroke: none,
+        inset: 0pt,
+        outset: 0pt,
+      )
+      // my-node(pos, name, id, stroke: blue, width: 55pt, inset: 0pt)
+    },
+
     // input variables
     my-node((0, 0), $x_1$, "x1", stroke: none),
     my-node((0, 3), $x_2$, "x2", stroke: none),
@@ -377,19 +394,23 @@ Let us build a computational graph for the very same example function from
     my-node((1, 0), $v_(-1)$, "v-1"),
     my-node((1, 3), $v_0$, "v0"),
 
-    my-node((2, 0.25), $v_1$, "v1"),
-    my-node((2, 1.5), $v_2$, "v2"),
+    let pos_v1 = (2, 0.25),
+    my-node(pos_v1, $v_1$, "v1"),
+    let pos_v2 = (2, 1.5),
+    my-node(pos_v2, $v_2$, "v2"),
 
-    my-node((3, 2.5), $v_3$, "v3"),
-    my-node((3, 1), $v_4$, "v4"),
+    let pos_v3 = (3, 2.5),
+    my-node(pos_v3, $v_3$, "v3"),
+    let pos_v4 = (3, 1),
+    my-node(pos_v4, $v_4$, "v4"),
 
-    my-node((4, 1.5), $v_5$, "v5"),
+    let pos_v5 = (4, 1.4),
+    my-node(pos_v5, $v_5$, "v5"),
 
     // output vars
     my-node((5, 1.5), $y_0$, "y0", stroke: none),
 
     // EDGES
-    let my-edge = edge.with(marks: "->"),
 
     // input vars
     my-edge(<x1>, <v-1>),
@@ -412,6 +433,18 @@ Let us build a computational graph for the very same example function from
 
     // output vars
     my-edge(<v5>, <y0>),
+
+    // LABELS
+
+    my-label(pos_v1, $sin(v_(-1))$, none),
+
+    my-label(pos_v2, $v_(-1) v_0$, none),
+
+    my-label(pos_v3, $v_0$, none),
+
+    my-label(pos_v4, $v_1 - v_2$, none),
+
+    my-label(pos_v5, $v_4 + v_3$, none),
   ),
 ) <diag:computational_graph>
 
