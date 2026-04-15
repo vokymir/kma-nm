@@ -246,13 +246,90 @@ valuable. The differences are summarized in @tab:comparison_fd_sym.
 
     [Disadvantages], [$h arrow 0$:unstable, \ $epsilon$-sensitive], [expression swell],
   ),
-)<tab:comparison_fd_sym>
+) <tab:comparison_fd_sym>
 
 = Automatic differentiation
 
-TODO: že existují dvě varianty, začneme tím, co mají společného
+Because both finite differences and symbolic method have their respective
+drawbacks a need for another method arised. The precise year of automatic
+differentiation discovery is not known, some claims it was as soon as the second
+half of 1970. Nevertheless, now is it a well-known numerical differentiation
+method with wide-spread use.
+
+This method have two distinct modes called forward and backward (reverse) mode.
+Both modes use fundamentally the same idea but in different direction, it will
+be explained later. However, before exploring the differences between modes let
+us first understand the core idea.
 
 == Core principles
+
+The AD exploits the fact that every function, no matter how complicated, can be
+expressed as function composition. This fundamental property is shown in
+@eq:function_composition. The other important property is that every composite
+function may be expressed as its variables and elementary
+operations#footnote[Elementary operations are atomic mathematical operations
+  such as addition and multiplication. In the context of AD we enlarge this set
+  of functions with well-known derivatives such as $cos$ or $log$.] that formed
+them.
+$
+              f(x) & = x^2 - 4 \
+              g(x) & = sin(x) + x \
+                   \
+  (f compose g)(x) & = f(g(x)) = \
+     f(sin(x) + x) & = (sin(x) + x)^2 - 4 \
+                   \
+  (g compose f)(x) & = g(f(x)) = \
+        g(x^2 - 4) & = sin(x^2 - 4) + x^2 - 4
+$ <eq:function_composition>
+
+With the function divided into its compositions, let us use an _evaluation
+trace_. A special table in which the whole function is recorded. Each row
+corresponds to an intermediate variable and the elementary operation which
+created them. These intermediats are typically denoted $v_i$ for functions
+$f(x): RR^n arrow RR^m$. If we label he variables in $RR^n$ as $x_i$ and
+the variables in $RR^m$ as $y_i$, than the intermediate variables indexing follows these rules:
+$
+  "Input variables" \
+  v_(i-n) = x_i, quad i = 1,...,n \
+  "Intermediate variables" \
+  v_i, quad i = 1,...,l \
+  "Output variables" \
+  y_(m-i) = v_(l-i), quad i = m - 1,..., 0
+$ <eq:indexing_rules>
+
+Let us demonstrate the evaluation trace on a simple example. We will calculate
+the function value using evaluation trace for a simple function and their
+inputs:
+$
+  y = f(x_1, x_2) = sin(x_1) - x_1 x_2 + x_2 \
+  x_1 = pi, quad x_2 = 2 \
+  "(note" y: RR^2 arrow RR ")"
+$ <eq:evaluation_trace>
+
+#figure(
+  caption: "Evaluation trace for simple example function.",
+  table(
+    columns: 2,
+
+    table.header([*Variable*], [*Value*]),
+
+    $v_(-1) = x_1$, $pi$,
+
+    $v_0 = x_2$, $2$,
+
+    $v_1 = sin(v_(-1))$, $0$,
+
+    $v_2 = v_(-1) v_0$, $2 pi$,
+
+    $v_3 = v_0$, $2$,
+
+    $v_4 = v_1 - v_2$, $-2 pi$,
+
+    $v_5 = v_4 + v_3$, $2 - 2 pi$,
+
+    $y_0 = v_5$, $2 - 2 pi$,
+  ),
+) <tab:evaluation_trace>
 
 TODO: proč to funguje, teorie za tím
 
