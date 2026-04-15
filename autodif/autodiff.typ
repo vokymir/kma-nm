@@ -7,6 +7,7 @@
 // highlight all TODOs, which is WOW, easy yet not
 #show regex("TODO(.*)"): it => text(fill: red, weight: "bold")[#it]
 
+// #bibliography("refs.bib")
 #show: ieee.with(
   title: [Automatic Differentiation],
   abstract: [
@@ -333,7 +334,7 @@ $ <eq:evaluation_trace>
 
     $v_5 = v_4 + v_3$, $2 - 2 pi$,
 
-    $y_0 = v_5$, $2 - 2 pi$,
+    $y_1 = v_5$, $2 - 2 pi$,
   ),
 ) <tab:evaluation_trace>
 
@@ -410,7 +411,7 @@ Let us build a computational graph for the very same example function from
     my-node(pos_v5, $v_5$, "v5"),
 
     // output vars
-    my-node((5, 1.5), $y_0$, "y0", stroke: none),
+    my-node((5, 1.5), $y_1$, "y1", stroke: none),
 
     // EDGES
 
@@ -434,7 +435,7 @@ Let us build a computational graph for the very same example function from
     my-edge(<v4>, <v5>),
 
     // output vars
-    my-edge(<v5>, <y0>),
+    my-edge(<v5>, <y1>),
 
     // LABELS
 
@@ -510,7 +511,7 @@ $
   table(
     columns: 4,
 
-    table.header([*Variable*], [*Value*], [*Tangent*], [*Value*]),
+    table.header([*Variable*], [*Value*], [*Tangent*], [*Tangent Value*]),
 
     $v_(-1) = x_1$, $pi$, $dot(v)_(-1) = dot(x)_1$, $1$,
 
@@ -534,16 +535,47 @@ $
     $-3 + 0 =
     -3$,
 
-    $y_0 = v_5$, $2 - 2 pi$, $dot(y)_0 = dot(v)_5$, $-3$,
+    $y_1 = v_5$, $2 - 2 pi$, $dot(y)_1 = dot(v)_5$, $-3$,
   ),
 ) <tab:evaluation_trace_partial_derivative>
 
-TODO: důležitý je "přenášení" derivací spolu s hodnotou ve výpočtu
+This is the essence of forward mode autodiff: At every step calculate the
+elementary operation as well as the derivatives. Both operations use simple
+arithmetics or known derivatives therefore the precision is only influenced by
+computer precision.
+
+In the example it is not evident because the function projects $RR^2 arrow RR$,
+but we did calculate a column in Jacobian matrix. General Jacobian matrix is
+reminded in @eq:jacobian.
+$
+  JJ = mat(
+    delim: "[",
+    (partial y_1) / (partial x_1), dots, (partial y_1) / (partial x_n);
+    dots.v, dots.down, dots.v;
+    (partial y_m) / (partial x_1), dots, (partial y_m) / (partial x_n);
+  )
+$ <eq:jacobian>
+
+Jacobian matrix of our example function is the shape of $1 times 2$. If we fill
+in the known value we get:
+$
+  JJ = mat(
+    delim: "[",
+    (partial y_1) / (partial x_1), (partial y_1) / (partial x_2);
+  )
+  = mat(
+    delim: "[",
+    -3, (partial y_1) / (partial x_2);
+  )
+$ <eq:jacobian_example_function>
+
+This beautifully demonstrates the important attribute of the autodiff forward
+method: It is extremely useful for differentiating functions with few inputs and
+many outputs. As you know, for function $f: RR^n arrow RR^m$ its Jacobian matrix
+shape is $m times n$. For $n << m$ this mode of autodiff method is the more
+effective as it requires only $n$ passes.
 
 TODO: duální čísla #sym.epsilon^2 = 0 jako další matematický pohled na věc
-
-TODO: vhodné pro málo vstupů, hodně výstupů - pro každý vstup třeba další
-průchod
 
 == Backward mode: The adjoint mode
 
