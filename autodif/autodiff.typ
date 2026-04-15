@@ -10,10 +10,10 @@
 #show: ieee.with(
   title: [Automatic Differentiation],
   abstract: [
-    This paper provides an explanation of Automatic Differentiation (AD) concept
-    for university students at near-bachelor level. Includes comparison with
-    other differentiation methods, very simple AD implementation example and
-    more realistic usage in python library.
+    This paper provides an explanation of Automatic Differentiation (autodiff)
+    concept for university students at near-bachelor level. Includes comparison
+    with other differentiation methods, very simple autodiff implementation
+    example and more realistic usage in python library.
   ],
   authors: (
     (
@@ -129,9 +129,9 @@ derivatives.
 
 = Alternative differentiation methods
 
-Automatic differentiation was not the first method for finding derivatives
-utilizing computer. In fact it is conceptually more complex than the previous
-methods.
+Automatic differentiation (autodiff) was not the first method for finding
+derivatives utilizing computer. In fact it is conceptually more complex than the
+previous methods.
 
 That is not to say the _older_ methods are inherently worse because they were
 discovered sooner or that are less complex. Every method is useful in particular
@@ -267,14 +267,14 @@ us first understand the core idea.
 
 == Core principles
 
-The AD exploits the fact that every function, no matter how complicated, can be
-expressed as function composition. This fundamental property is shown in
+Autodiff exploits the fact that every function, no matter how complicated, can
+be expressed as function composition. This fundamental property is shown in
 @eq:function_composition. The other important property is that every composite
 function may be expressed as its variables and elementary
 operations#footnote[Elementary operations are atomic mathematical operations
-  such as addition and multiplication. In the context of AD we enlarge this set
-  of functions with well-known derivatives such as $cos$ or $log$.] that formed
-them.
+  such as addition and multiplication. In the context of autodiff we enlarge
+  this set of functions with well-known derivatives such as $cos$ or $log$.]
+that formed them.
 $
               f(x) & = x^2 - 4 \
               g(x) & = sin(x) + x \
@@ -448,12 +448,14 @@ Let us build a computational graph for the very same example function from
   ),
 ) <diag:computational_graph>
 
-TODO: proč to funguje, teorie za tím
-
-TODO: chain rule, výpočetní graf, potřeba mít známé funkce a jejich derivace
-
+TODO: popsat ještě víc matematicky - ukázat derivace a chain rule
 TODO: "jediný" rozdíl mezi FM/BM je pořadí derivací v chain rule - dá se
 vysvětlit i jako pořadí násobení jakobiánů
+
+To summarize, autodiff makes use of function (de)composition, chain rule and
+utilizes computational graph. Similarily to symbolic method it requires a set of
+known derivatives, although it does not need rules as it implicitely works with
+chain rule.
 
 == Forward mode: The tangent linear mode
 
