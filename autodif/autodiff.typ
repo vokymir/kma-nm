@@ -7,7 +7,7 @@
   title: [Automatic Differentiation],
   abstract: [
     This paper provides an explanation of Automatic Differentiation (AD) concept
-    for univerity students at near-bachelor level. Includes comparision with
+    for university students at near-bachelor level. Includes comparison with
     other differentiation methods, very simple AD implementation example and
     more realistic usage in python library.
   ],
@@ -65,10 +65,10 @@
 Derivative is an indispensable tool in almost any field of mathematics. Its
 useful property lies in revealing the rate of change of any function. The
 process of differentiation is very simple, therefore presumably easily encoded
-into computer program. From the birth of machine computing various methods vere
+into computer program. Since the birth of machine computing various methods were
 discovered, all with their respective drawbacks. We will explore these methods
 later. It is necessary to understand the foundational challenges and
-inner-workings of differentiation first.
+inner workings of differentiation first.
 
 Derivative may be defined as a limit, such as
 $
@@ -142,10 +142,10 @@ precise method, rather a numerical tool for obtaining _good-enough_ derivative.
 This method doesn't take advantage of computers properties. It only uses the
 machine as a mere calculator.
 
-Humans represent numbers most often using a arabic numerals. Computers represent
+Humans represent numbers most often using arabic numerals. Computers represent
 and store numbers in different formats. When working with non-integers a
 floating point arithmetic was introduced, and later standardized @IEEE754. This
-format has limited precision and for very big or very small (near to zero)
+format has limited precision and for very large or very small (near to zero)
 numbers is prone to errors.
 
 The great issue arises as the requirement on precision increases. For simplicity
@@ -163,16 +163,16 @@ $
   f(x)' & = (100 - 100) / 0.01 \
   f(x)' & = 0
 $
-So, numerically we get the result of derivation to be $0$, but we know that
-derivation of linear function is $1$.
+So, numerically we get the result of derivative to be $0$, but we know that
+derivative of linear function is $1$.
 
-TODO: FD use 2x bigger interval for better precision? maybe dont write
+TODO: FD use 2x larger interval for better precision? maybe dont write
 
 
 == Symbolic method
 
 A symbolic method was developed to tackle the problem with FD. It is precise.
-The method require a set of known derivatives as well as set of rules (chain
+The method requires a set of known derivatives as well as set of rules (chain
 rule, product rule, ...). For a given expression it uses the rules to expand it
 until only known derivatives are in the expression, then simplify the obtained
 expression and only then calculate the derivative.
@@ -205,12 +205,12 @@ $
              f'(x) & = 3x^2 + 6x + 3
 $ <eq:expression_swell_no>
 
-If the solver begins by appling the product rule repeatedly as seen in
-@eq:expression_swell_yes, the expression swell demonstrates rather quickly.
+If the solver begins by applying the product rule repeatedly as seen in
+@eq:expression_swell_yes, expression swell appears rather quickly.
 Depending on the solver it might simplify during the process so it might be
 little different than the example. Nevertheless, for more complex expressions it
 might not even be possible and the problem holds. The example should have
-demonstrated that even for very simple differential equation, if done
+demonstrated that even for very simple function, if differentiation done
 suboptimally, the computational cost is very high.
 $
   f(x) = (x + 1)^3 = (x+1) (x+1) (x+1) \
