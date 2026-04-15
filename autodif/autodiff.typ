@@ -1,4 +1,8 @@
+// template
 #import "@preview/charged-ieee:0.1.4": ieee
+
+// library to create graphs
+#import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node
 
 // highlight all TODOs, which is WOW, easy yet not
 #show regex("TODO(.*)"): it => text(fill: red, weight: "bold")[#it]
@@ -330,6 +334,86 @@ $ <eq:evaluation_trace>
     $y_0 = v_5$, $2 - 2 pi$,
   ),
 ) <tab:evaluation_trace>
+
+We can extend the evaluation trace with _computational graph_. That is a
+directed acyclic graph (DAG) in which vertices represent variables and edges
+functions. The graph must be directed and acyclic to ensure the correct flow of
+computation.
+
+Computational graph is fundamental for our understanding and as a data structure
+in which can the evaluation trace be algorithmically represented.
+
+Let us build a computational graph for the very same example function from
+@eq:evaluation_trace. Note that is strongly corresponds with
+@tab:evaluation_trace.
+
+#figure(
+  caption: "Computational graph for simple example function.",
+
+  diagram(
+    node-shape: circle,
+    node-fill: none,
+    node-stroke: 1pt + black.transparentize(60%),
+    spacing: (30pt, 15pt),
+    let text-size = 8pt,
+
+    let my-node(pos, name, id, ..args) = {
+      node(
+        pos,
+        text(text-size, name),
+        name: id,
+        width: 10pt,
+        height: 10pt,
+        inset: 5pt,
+        ..args,
+      )
+    },
+
+    // input variables
+    my-node((0, 0), $x_1$, "x1", stroke: none),
+    my-node((0, 3), $x_2$, "x2", stroke: none),
+
+    // intermediate vars (grouped by column)
+    my-node((1, 0), $v_(-1)$, "v-1"),
+    my-node((1, 3), $v_0$, "v0"),
+
+    my-node((2, 0.25), $v_1$, "v1"),
+    my-node((2, 1.5), $v_2$, "v2"),
+
+    my-node((3, 2.5), $v_3$, "v3"),
+    my-node((3, 1), $v_4$, "v4"),
+
+    my-node((4, 1.5), $v_5$, "v5"),
+
+    // output vars
+    my-node((5, 1.5), $y_0$, "y0", stroke: none),
+
+    // EDGES
+    let my-edge = edge.with(marks: "->"),
+
+    // input vars
+    my-edge(<x1>, <v-1>),
+    my-edge(<x2>, <v0>),
+
+    // intermediate vars (grouped by source)
+    my-edge(<v-1>, <v1>),
+    my-edge(<v-1>, <v2>),
+
+    my-edge(<v0>, <v2>),
+    my-edge(<v0>, <v3>),
+
+    my-edge(<v1>, <v4>),
+
+    my-edge(<v2>, <v4>),
+
+    my-edge(<v3>, <v5>),
+
+    my-edge(<v4>, <v5>),
+
+    // output vars
+    my-edge(<v5>, <y0>),
+  ),
+) <diag:computational_graph>
 
 TODO: proč to funguje, teorie za tím
 
