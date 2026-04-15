@@ -1,5 +1,8 @@
 #import "@preview/charged-ieee:0.1.4": ieee
 
+// highlight all TODOs, which is WOW, easy yet not
+#show regex("TODO(.*)"): it => text(fill: red, weight: "bold")[#it]
+
 #show: ieee.with(
   title: [Automatic Differentiation],
   abstract: [
@@ -19,6 +22,8 @@
   figure-supplement: [Fig.],
 )
 
+#set math.equation(numbering: "(1)")
+
 #show ref: it => {
   let el = it.element
 
@@ -27,19 +32,27 @@
   }
 
   let loc = it.element.location()
-  let page = loc.page()
+  // let page = loc.page()
 
-  if el.func() == heading {
-    return link(
-      loc,
-      [_#el.body (page #page)_],
-    )
-  }
+  // if el.func() == heading {
+  //   return link(
+  //     loc,
+  //     [_#el.body (page #page)_],
+  //   )
+  // }
 
+  // if el.func() == math.equation {
+  //   return link(
+  //     loc,
+  //     [_Equation #el.numbering at page #(page)_],
+  //   )
+  // }
   if el.func() == math.equation {
+    let num = counter(math.equation).at(loc)
+
     return link(
       loc,
-      [_Equation #el.numbering at page #(page)_],
+      [Eq. #context { numbering(math.equation.numbering, ..num) }],
     )
   }
 
@@ -153,11 +166,61 @@ $
 So, numerically we get the result of derivation to be $0$, but we know that
 derivation of linear function is $1$.
 
+TODO: FD use 2x bigger interval for better precision? maybe dont write
 
 
 == Symbolic method
 
-TODO: co je symbolická metoda, jak funguje, plusy a minusy
+A symbolic method was developed to tackle the problem with FD. It is precise.
+The method require a set of known derivatives as well as set of rules (chain
+rule, product rule, ...). For a given expression it uses the rules to expand it
+until only known derivatives are in the expression, then simplify the obtained
+expression and only then calculate the derivative.
+$
+         f(x) & = sin(x)/x \
+      "using" & "quotient rule:" \
+    g(x)/h(x) & = (g'(x)h(x) - g(x)h'(x))/(h(x)^2) \
+        f'(x) & = (sin(x)'x - sin(x)x') / (x^2) \
+      "using" & "known derivatives:" \
+      sin(x)' & = cos(x) \
+           x' & = 1 \
+        f'(x) & = (cos(x)x - sin(x)1)/(x^2) \
+  "simplify:" & \
+        f'(x) & = (x cos(x) - sin(x))/(x^2)
+$<eq:symbolic>
+
+In @eq:symbolic is demonstrated how symbolic method works. This method is
+used in programs such as Matlab, because it is precise. Note that this method
+has its drawbacks. The most important one is _expression swell_. The expression
+might become overly complex during differentiation because operations were not
+applied in advantageous order. While the result might be simple, the process
+might be not.
+
+We will demonstrate expression swell on the function $f(x) = (x + 1)^3$.
+Depending on how the symbolic solver program was written it might first expand
+the term as seen in @eq:expression_swell_no. This approach in this particular
+case is better and leads to faster calculation and less computer memory usage.
+$
+  f(x) = (x + 1)^3 & = x^3 + 3x^2 + 3x + 1 \
+             f'(x) & = 3x^2 + 6x + 3
+$ <eq:expression_swell_no>
+
+If the solver begins by appling the product rule repeatedly as seen in
+@eq:expression_swell_yes, the expression swell demonstrates rather quickly.
+Depending on the solver it might simplify during the process so it might be
+little different than the example. Nevertheless, for more complex expressions it
+might not even be possible and the problem holds. The example should have
+demonstrated that even for very simple differential equation, if done
+suboptimally, the computational cost is very high.
+$
+  f(x) = (x + 1)^3 = (x+1) (x+1) (x+1) \
+  f′(x) = 1(x+1)(x+1) + (x+1)1(x+1) + (x+1)(x+1)1 \
+  f'(x) = (x+1)(x+1) + (x+1)(x+1) + (x+1)(x+1) \
+  "using:" (x+1)(x+1) = (x^2+x+x+1) \
+  f′(x) = (x^2+x+x+1) + (x^2+x+x+1) + (x^2+x+x+1) \
+  f′(x) = x^2+x+x+1 + x^2+x+x+1 + x^2+x+x+1 \
+  f'(x) = 3x^2 + 6x + 3
+$ <eq:expression_swell_yes>
 
 == Comparison
 
