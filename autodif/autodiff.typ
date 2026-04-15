@@ -224,7 +224,29 @@ $ <eq:expression_swell_yes>
 
 == Comparison
 
-TODO: tabulka s porovnáním + vysvětlení proč
+Both discussed methods have been used and still might be useful to this day.
+While FD is really simple, can differentiate _"black box_" functions but can
+lead to wrong results due to computer floating point precision, symbolic method
+is harder to implement, requires database of known derivatives and rules and is
+prone to expression swell thus high memory usage but is precise which is highly
+valuable. The differences are summarized in @tab:comparison_fd_sym.
+
+#figure(
+  caption: "Comparison between finite differences and symbolic method.",
+  table(
+    columns: 3,
+
+    table.header([*Property*], [*FD*], [*Symbolic*]),
+
+    [Accuracy], [approximation], [precise],
+
+    [Cost], [$O(1)$], [higher],
+
+    [Implementation], [easy], [harder],
+
+    [Disadvantages], [$h arrow 0$:unstable, \ $epsilon$-sensitive], [expression swell],
+  ),
+)<tab:comparison_fd_sym>
 
 = Automatic differentiation
 
