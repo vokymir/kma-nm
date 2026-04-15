@@ -216,15 +216,17 @@ little different than the example. Nevertheless, for more complex expressions it
 might not even be possible and the problem holds. The example should have
 demonstrated that even for very simple function, if differentiation done
 suboptimally, the computational cost is very high.
-$
-  f(x) = (x + 1)^3 = (x+1) (x+1) (x+1) \
-  f′(x) = 1(x+1)(x+1) + (x+1)1(x+1) + (x+1)(x+1)1 \
-  f'(x) = (x+1)(x+1) + (x+1)(x+1) + (x+1)(x+1) \
-  "using:" (x+1)(x+1) = (x^2+x+x+1) \
-  f′(x) = (x^2+x+x+1) + (x^2+x+x+1) + (x^2+x+x+1) \
-  f′(x) = x^2+x+x+1 + x^2+x+x+1 + x^2+x+x+1 \
-  f'(x) = 3x^2 + 6x + 3
-$ <eq:expression_swell_yes>
+#text(size: 9pt)[ // must have smaller font-size because it's huuuge
+  $
+    f(x) = (x + 1)^3 = (x+1) (x+1) (x+1) \
+    f′(x) = 1(x+1)(x+1) + (x+1)1(x+1) + (x+1)(x+1)1 \
+    f'(x) = (x+1)(x+1) + (x+1)(x+1) + (x+1)(x+1) \
+    "using:" (x+1)(x+1) = (x^2+x+x+1) \
+    f′(x) = (x^2+x+x+1) + (x^2+x+x+1) + (x^2+x+x+1) \
+    f′(x) = x^2+x+x+1 + x^2+x+x+1 + x^2+x+x+1 \
+    f'(x) = 3x^2 + 6x + 3
+  $ <eq:expression_swell_yes>
+]
 
 == Comparison
 
@@ -448,7 +450,18 @@ Let us build a computational graph for the very same example function from
   ),
 ) <diag:computational_graph>
 
-TODO: popsat ještě víc matematicky - ukázat derivace a chain rule
+Decomposition of differentials provided by the chain rule of partial derivatives
+of composite functions connects the previous concepts and is fundamental for
+autodiff. One example for function $y(x) = (f compose g compose h)$. The
+variables $v_i$ corresponds with the naming in evaluation trace.
+$
+  y = f(g(h(x))) = f(g(h(v_0))) = f(g(v_1)) = f(v_2) = v_3 \
+  (partial y) / (partial x) = (partial y) / (partial v_2) (partial v_2) /
+  (partial v_1) (partial v_1) / (partial x) \
+  (partial y) / (partial x) = (partial f(v_2)) / (partial v_2) (partial g(v_1))
+  / (partial v_1) (partial h(v_0)) / (partial v_0)
+$ <eq:diff_decomposition>
+
 TODO: "jediný" rozdíl mezi FM/BM je pořadí derivací v chain rule - dá se
 vysvětlit i jako pořadí násobení jakobiánů
 
@@ -458,6 +471,72 @@ known derivatives, although it does not need rules as it implicitely works with
 chain rule.
 
 == Forward mode: The tangent linear mode
+
+In forward mode the differential decomposition (chain rule) is computed from the
+inside out (i.e. first is computed the rightmost element $(partial v_1) /
+(partial x)).$ This mode uses this chain rule recursive relation:
+$
+  (partial v_i) / (partial x) = (partial v_i) / (partial v_(i-1)) (partial
+  v_(i-1)) / (partial x), quad v_n = y
+$
+
+If this relation is further expanded it gives:
+$
+  (partial y) / (partial x) & = (partial y) / (partial v_(n-1)) (partial
+                              v_(n-1)) / (partial x) \
+                            & = (partial y) / (partial v_(n-1)) ( (partial
+                                v_(n-1)) / (partial v_(n-2)) (partial v_(n-2)) /
+                                (partial x) ) \
+                            & = (partial y) / (partial v_(n-1)) ( (partial
+                                v_(n-1)) / (partial v_(n-2)) ( (partial v_(n-2))
+                                  / (partial v_(n-3)) (partial v_(n-3)) /
+                                  (partial x) ) ) \
+                            & = ...
+$
+Which is exactly the bottom-up (or inside-out) approach. Let us see on an
+example how it works. We will use the evaluation trace augmented of the value of
+partial derivative (often called tangent). We use the same function as in
+@eq:evaluation_trace and we are computing the partial derivative $(partial y) /
+(partial x_1)$.
+$
+  y = f(x_1, x_2) = sin(x_1) - x_1 x_2 + x_2 \
+  x_1 = pi, quad x_2 = 2 \
+  dot(x)_1 = (partial x_1) / (partial x_1) = 1,
+  quad dot(x)_2 = (partial x_2) / (partial x_1) = 0
+$
+
+#figure(
+  caption: "Evaluation trace for simple example partial derivative.",
+  table(
+    columns: 4,
+
+    table.header([*Variable*], [*Value*], [*Tangent*], [*Value*]),
+
+    $v_(-1) = x_1$, $pi$, $dot(v)_(-1) = dot(x)_1$, $1$,
+
+    $v_0 = x_2$, $2$, $dot(v)_0 = dot(x)_2$, $0$,
+
+    $v_1 = sin(v_(-1))$, $0$, $dot(v)_1 = cos(v_(-1))$, $cos(pi) = -1$,
+
+    $v_2 = v_(-1) v_0$,
+    $2 pi$,
+    $dot(v)_2 = dot(v)_(-1) v_0 +
+    v_(-1) dot(v)_0$,
+    $1 dot 2 + pi dot 0 = 2$,
+
+    $v_3 = v_0$, $2$, $dot(v)_3 = dot(v)_0$, $0$,
+
+    $v_4 = v_1 - v_2$, $-2 pi$, $dot(v)_4 = dot(v)_1 - dot(v)_2$, $-1 - 2 = -3$,
+
+    $v_5 = v_4 + v_3$,
+    $2 - 2 pi$,
+    $dot(v)_5 = dot(v)_4 + dot(v)_3$,
+    $-3 + 0 =
+    -3$,
+
+    $y_0 = v_5$, $2 - 2 pi$, $dot(y)_0 = dot(v)_5$, $-3$,
+  ),
+) <tab:evaluation_trace_partial_derivative>
 
 TODO: důležitý je "přenášení" derivací spolu s hodnotou ve výpočtu
 
