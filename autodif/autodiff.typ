@@ -3,11 +3,11 @@
 #show: ieee.with(
   title: [Automatic Differentiation],
   abstract: [
-  This paper provides an explanation of Automatic Differentiation (AD) concept
-  for univerity students at near-bachelor level. Includes comparision with other
-  differentiation methods, very simple AD implementation example and more
-  realistic usage in python library.
-     ],
+    This paper provides an explanation of Automatic Differentiation (AD) concept
+    for univerity students at near-bachelor level. Includes comparision with
+    other differentiation methods, very simple AD implementation example and
+    more realistic usage in python library.
+  ],
   authors: (
     (
       name: "Jakub Vokoun",
@@ -24,24 +24,22 @@
 
   if el == none {
     return it
-  } 
+  }
 
   let loc = it.element.location()
   let page = loc.page()
 
   if el.func() == heading {
-
     return link(
-    loc,
-    [_#el.body (page #page)_]
+      loc,
+      [_#el.body (page #page)_],
     )
-  } 
+  }
 
   if el.func() == math.equation {
-
     return link(
-    loc,
-    [_Equation #el.numbering at page #(page)_]
+      loc,
+      [_Equation #el.numbering at page #(page)_],
     )
   }
 
@@ -61,7 +59,7 @@ inner-workings of differentiation first.
 
 Derivative may be defined as a limit, such as
 $
-L = lim_(h arrow 0)( f(a + h) - f(a) ) / h
+  L = lim_(h arrow 0)( f(a + h) - f(a) ) / h
 $ <eq:derivative>
 where $f(x)$ is differentiable on an open interval containing point $a$, and if
 the limit $L$ exists. In principle, the derivative of any function (if exists)
@@ -73,20 +71,20 @@ differentiation.
 
 For example, if we know the derivative of a polynomial
 $
-(x^a)' = a x^(a-1)
+  (x^a)' = a x^(a-1)
 $
 where $a$ is an arbitrary integer, and a sum rule
 $
-(alpha f + beta g)' = alpha f' + beta g'
+  (alpha f + beta g)' = alpha f' + beta g'
 $
 for any function $f$, $g$, and all real numbers $alpha$, $beta$, we may obtain
 derivative for this function:
 $
-f(x) = 3x^2 + 5x
+  f(x) = 3x^2 + 5x
 $
 Using both the rules its apparent the result will be:
 $
-f(x)' = 6x + 5
+  f(x)' = 6x + 5
 $
 This simple example demonstrated, that with as little as one known derivative
 and one rule, we are able to differentiate a whole class of functions,
@@ -103,9 +101,9 @@ important part is the ability to perform sequential instructions. This trait
 might be easily exploitable in order to create a computer program which would
 take any function as an input and produce its derivative as output.
 
-Most often the function we need to differentiate is in the form 
+Most often the function we need to differentiate is in the form
 $
-f: RR^n arrow RR^m
+  f: RR^n arrow RR^m
 $
 where $n$ and $m$ are any positive integers. It might be useful to calculate its
 partial derivatives or the Jacobian matrix. For some tasks it might be
@@ -129,7 +127,7 @@ This method is based on the @eq:derivative. The assumption is, that with a
 small-enough $h$, the error will be negligible. It is not an analytical, a
 precise method, rather a numerical tool for obtaining _good-enough_ derivative.
 This method doesn't take advantage of computers properties. It only uses the
-machine as a mere calculator. 
+machine as a mere calculator.
 
 Humans represent numbers most often using a arabic numerals. Computers represent
 and store numbers in different formats. When working with non-integers a
@@ -144,13 +142,13 @@ because it is normal arithmetic with precision up to two numbers.
 
 If we tried to calculate derivative for $f(x) = x$, $a = 100$ and $h = 0.01$
 $
-f(x)' = ( f(100 + 0.01) - f(100) ) / 0.01 \
+  f(x)' = ( f(100 + 0.01) - f(100) ) / 0.01 \
 $
 we would encounter first error when summing $100 + 0.01 = 100.01$. Due to `FD2`
 precision, it is trimmed to $100$. Next, the function $f$ is identity:
 $
-f(x)' &= (100 - 100) / 0.01 \
-f(x)' &= 0
+  f(x)' & = (100 - 100) / 0.01 \
+  f(x)' & = 0
 $
 So, numerically we get the result of derivation to be $0$, but we know that
 derivation of linear function is $1$.
