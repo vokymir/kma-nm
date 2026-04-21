@@ -788,11 +788,15 @@ in the same way. The function `__init__` explains python how to initialize the
 variable, `__repr__` tells it how to represent it in text.
 
 The output of this program is:
-```
-x1 = (value: 3.141592653589793, tangent: 1.0),
-x2 = (value: 2.0, tangent: 0.0)
-y = (value: -4.283185307179586, tangent: -3.0)
-```
+#figure(
+  caption: "The output of FM autodiff example.",
+  ```
+  x1 = (value: 3.141592653589793, tangent: 1.0),
+  x2 = (value: 2.0, tangent: 0.0)
+  y = (value: -4.283185307179586, tangent: -3.0)
+  ```,
+)
+
 Which gives to show that these results are the same as ours previously ($2 - 2pi
 approx -4.28$). Note that we decided that the partial would be calculated with
 respect to $x_1$ simply by setting its tangent to $1$.
@@ -800,7 +804,114 @@ respect to $x_1$ simply by setting its tangent to $1$.
 #colbreak()
 == Backward mode
 
-TODO: + vysvětlení jak se používá computational graf k zpětnému chodu
+```py
+import math
+
+class Variable:
+
+    def __init__(self, value, adjoint=0.0):
+        self.value = value
+        self.adjoint = adjoint
+
+    def backward(self, adjoint):
+        self.adjoint += adjoint
+
+    def __add__(self, other):
+        variable = \
+          Variable(self.value + other.value)
+
+        def backward(adjoint):
+            variable.adjoint += adjoint
+            self_adjoint = adjoint * 1.0
+            other_adjoint = adjoint * 1.0
+            #
+            self.backward(self_adjoint)
+            other.backward(other_adjoint)
+
+        variable.backward = backward
+        return variable
+
+    def __sub__(self, other):
+        variable = \
+          Variable(self.value - other.value)
+
+        def backward(adjoint):
+            variable.adjoint += adjoint
+            self_adjoint = adjoint * 1.0
+            other_adjoint = adjoint * -1.0
+            #
+            self.backward(self_adjoint)
+            other.backward(other_adjoint)
+
+        variable.backward = backward
+        return variable
+
+    def __mul__(self, other):
+        variable = \
+          Variable(self.value * other.value)
+
+        def backward(adjoint):
+            variable.adjoint += adjoint
+            self_adjoint = adjoint * other.value
+            other_adjoint = adjoint * self.value
+            #
+            self.backward(self_adjoint)
+            other.backward(other_adjoint)
+
+        variable.backward = backward
+        return variable
+
+
+    def __repr__(self) -> str:
+        return f"(value: {self.value}," \
+               f" adjoint: {self.adjoint})"
+
+
+def sin(x):
+    variable = Variable(math.sin(x.value))
+
+    def backward(adjoint):
+        variable.adjoint += adjoint
+        x.backward(adjoint * math.cos(x.value))
+
+    variable.backward = backward
+    return variable
+
+
+x1 = Variable(math.pi)
+x2 = Variable(2.0)
+
+y = sin(x1) - x1 * x2 + x2
+y.backward(1.0)
+
+print(f"{x1 = },\n{x2 = }")
+print(f"{y = }")
+```
+
+The backward mode requires more complex implementation. We created a data type
+of `Variable` again, but this time it has function `backward()`, which is used
+to accumulate all contributions. However, this function is overwritten when
+mathematical operation is applied to the variable.
+
+For example, when the multiplication takes place, it creates new variable to
+hold the value (forward pass) as well to hold the backward function. And the
+backward function is nothing special, it just specifies how adjoint is
+calculated. It uses the same principle as shown in
+@tab:evaluation_trace_partial_derivative_reverse_mode.
+
+#figure(
+  caption: "The output of BM autodiff example.",
+  ```
+  x1 = (value: 3.141592653589793, adjoint: -3.0),
+  x2 = (value: 2.0, adjoint: -2.141592653589793)
+  y = (value: -4.283185307179586, adjoint: 1.0)
+  ```,
+)
+
+Please note, that it calculated the jacobian row $mat(delim: "[", -3",", 1-pi;)$
+as adjoints of $x_1, x_2$. The other interesting thing is that in order to
+compute that, we needed to call `backawrd()` method on the `y` variable. That
+call started a recursive process which filled adjoints of all variables.
 
 = Using existing autodif libraries in python
 
