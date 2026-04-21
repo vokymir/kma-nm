@@ -64,6 +64,16 @@
   it
 }
 
+#let pp(f, ..sink) = {
+  if f == [] { f = none }
+  let (args, kwargs) = (sink.pos(), sink.named())
+
+  let x = none
+  if (args.len() >= 1) { x = args.at(0) }
+
+  $(partial #f) / (partial #x)$
+}
+
 
 = Introduction
 
@@ -170,8 +180,6 @@ $
 $
 So, numerically we get the result of derivative to be $0$, but we know that
 derivative of linear function is $1$.
-
-TODO: FD use 2x larger interval for better precision? maybe dont write
 
 
 == Symbolic method
@@ -457,10 +465,8 @@ autodiff. One example for function $y(x) = (f compose g compose h)$. The
 variables $v_i$ corresponds with the naming in evaluation trace.
 $
   y = f(g(h(x))) = f(g(h(v_0))) = f(g(v_1)) = f(v_2) = v_3 \
-  (partial y) / (partial x) = (partial y) / (partial v_2) (partial v_2) /
-  (partial v_1) (partial v_1) / (partial x) \
-  (partial y) / (partial x) = (partial f(v_2)) / (partial v_2) (partial g(v_1))
-  / (partial v_1) (partial h(v_0)) / (partial v_0)
+  pp(y, x) = pp(y, v_2) pp(v_2, v_1) pp(v_1, x) \
+  pp(y, x) = pp(f(v_2), v_2) pp(g(v_1), v_1) pp(h(v_0), v_0)
 $ <eq:diff_decomposition>
 
 TODO: "jediný" rozdíl mezi FM/BM je pořadí derivací v chain rule - dá se
@@ -474,36 +480,27 @@ chain rule.
 == Forward mode: The tangent linear mode
 
 In forward mode the differential decomposition (chain rule) is computed from the
-inside out (i.e. first is computed the rightmost element $(partial v_1) /
-(partial x)).$ This mode uses this chain rule recursive relation:
+inside out (i.e. first is computed the rightmost element $pp(v_1, x)).$ This mode uses this chain rule recursive relation:
 $
-  (partial v_i) / (partial x) = (partial v_i) / (partial v_(i-1)) (partial
-  v_(i-1)) / (partial x), quad v_n = y
+  pp(v_i, x) = pp(v_i, v_(i-1)) pp(v_(i-1), x), quad v_n = y
 $
 
 If this relation is further expanded it gives:
 $
-  (partial y) / (partial x) & = (partial y) / (partial v_(n-1)) (partial
-                              v_(n-1)) / (partial x) \
-                            & = (partial y) / (partial v_(n-1)) ( (partial
-                                v_(n-1)) / (partial v_(n-2)) (partial v_(n-2)) /
-                                (partial x) ) \
-                            & = (partial y) / (partial v_(n-1)) ( (partial
-                                v_(n-1)) / (partial v_(n-2)) ( (partial v_(n-2))
-                                  / (partial v_(n-3)) (partial v_(n-3)) /
-                                  (partial x) ) ) \
-                            & = ...
+  pp(y, x) & = pp(y, v_(n-1)) pp(v_(n-1), x) \
+           & = pp(y, v_(n-1)) ( pp(v_(n-1), v_(n-2)) pp(v_(n-2), x) ) \
+           & = pp(y, v_(n-1)) ( pp(v_(n-1), v_(n-2)) ( pp(v_(n-2), v_(n-3)) pp(v_(n-3), x) ) ) \
+           & = ...
 $
 Which is exactly the bottom-up (or inside-out) approach. Let us see on an
 example how it works. We will use the evaluation trace augmented of the value of
 partial derivative (often called tangent). We use the same function as in
-@eq:evaluation_trace and we are computing the partial derivative $(partial y) /
-(partial x_1)$.
+@eq:evaluation_trace and we are computing the partial derivative $pp(y, x_1)$.
 $
   y = f(x_1, x_2) = sin(x_1) - x_1 x_2 + x_2 \
   x_1 = pi, quad x_2 = 2 \
-  dot(x)_1 = (partial x_1) / (partial x_1) = 1,
-  quad dot(x)_2 = (partial x_2) / (partial x_1) = 0
+  dot(x)_1 = pp(x_1, x_1) = 1,
+  quad dot(x)_2 = pp(x_2, x_1) = 0
 $
 
 #figure(
@@ -550,9 +547,9 @@ reminded in @eq:jacobian.
 $
   JJ = mat(
     delim: "[",
-    (partial y_1) / (partial x_1), dots, (partial y_1) / (partial x_n);
+    pp(y_1, x_1), dots, pp(y_1, x_n);
     dots.v, dots.down, dots.v;
-    (partial y_m) / (partial x_1), dots, (partial y_m) / (partial x_n);
+    pp(y_m, x_1), dots, pp(y_m, x_n);
   )
 $ <eq:jacobian>
 
@@ -561,11 +558,11 @@ in the known value we get:
 $
   JJ = mat(
     delim: "[",
-    (partial y_1) / (partial x_1), (partial y_1) / (partial x_2);
+    pp(y_1, x_1), pp(y_1, x_2);
   )
   = mat(
     delim: "[",
-    -3, (partial y_1) / (partial x_2);
+    -3, pp(y_1, x_2);
   )
 $ <eq:jacobian_example_function>
 
@@ -575,9 +572,15 @@ many outputs. As you know, for function $f: RR^n arrow RR^m$ its Jacobian matrix
 shape is $m times n$. For $n << m$ this mode of autodiff method is the more
 effective as it requires only $n$ passes.
 
-TODO: duální čísla #sym.epsilon^2 = 0 jako další matematický pohled na věc
 
 == Backward mode: The adjoint mode
+
+With the backward mode, two passes are needed. The first serves to create the
+evaluation trace and computational graph and is performed as in forward mode.
+The second pass traverses the graph backwards. This mode uses this chain rule
+recursive relation:
+
+
 
 TODO: potřeba dva průchody - první k vytvoření výpočetního grafu a zpětný k
 tomu, abychom viděli jak který vstup kontributuje k výsledné hodnotě (kterou si
