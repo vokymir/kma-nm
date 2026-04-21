@@ -580,7 +580,80 @@ evaluation trace and computational graph and is performed as in forward mode.
 The second pass traverses the graph backwards. This mode uses this chain rule
 recursive relation:
 
+$
+  pp(y, v_i) = pp(y, v_(i+1)) pp(v_(i+1), v_i), quad v_0 = x
+$
 
+Which expanded looks like this:
+
+$
+  pp(y, x) & = pp(y, v_1) pp(v_1, x) \
+           & = ( pp(y, v_2) pp(v_2, v_1) ) pp(v_1, x) \
+           & = (( pp(y, v_3) pp(v_3, v_2) ) pp(v_2, v_1) ) pp(v_1, x) \
+           & = ...
+$
+
+And if we define an adjoint for a function $f: RR^n arrow RR^m$ where $i =
+1,...,n$ and $j = 1,...,m$ as:
+
+$
+  dash(v)_i = pp(y_j, v_i)
+$
+
+We can rewrite the expanded relation as:
+
+$
+  pp(y, x) & = dash(v)_1 pp(v_1, x) \
+           & = ( dash(v)_2 pp(v_2, v_1) ) pp(v_1, x) \
+           & = (( dash(v)_3 pp(v_3, v_2) ) pp(v_2, v_1) ) pp(v_1, x) \
+           & = ...
+$
+
+We will differentiate the same example function. Similarily to forward mode, we
+must select a variable to derivate by. In forward mode, it is one of income
+variables, in reverse mode it is one of output variables. In our case, we only
+have one output variable so it simplifies.
+
+$
+  y = f(x_1, x_2) = sin(x_1) - x_1 x_2 + x_2 \
+  x_1 = pi, quad x_2 = 2 \
+  dot(y) = 1
+$
+
+
+#figure(
+  caption: "Evaluation trace for reverse mode simple example partial
+  derivative.",
+  table(
+    columns: 4,
+
+    table.header([*(FW) Variable*], [*Value*], [*(RE) Adjoint*], [*Adjoint Value*]),
+
+    $v_(-1) = x_1$,
+    $pi$,
+    $dash(v)_(-1) = dash(x)_1 = \ dash(v)_1 dot
+    cos(v_(-1)) + dash(v)_2 dot v_0$,
+    $1 dot cos(pi) + (-1) dot 2\ = -1 -2 = -3$,
+
+    $v_0 = x_2$,
+    $2$,
+    $dash(v)_0 = dash(x)_2 = \ dash(v)_3 + dash(v)_2 dot
+    v_(-1)$,
+    $1 + (-1) dot pi \ = 1 - pi$,
+
+    $v_1 = sin(v_(-1))$, $0$, $dash(v)_1 = dash(v)_4 dot 1$, $1 dot 1 = 1$,
+
+    $v_2 = v_(-1) v_0$, $2 pi$, $dash(v)_2 = dash(v)_4 dot -1$, $1 dot -1 = -1$,
+
+    $v_3 = v_0$, $2$, $dash(v)_3 = dash(v)_5 dot 1$, $1 dot 1 = 1$,
+
+    $v_4 = v_1 - v_2$, $-2 pi$, $dash(v)_4 = dash(v)_5 dot 1$, $1 dot 1 = 1$,
+
+    $v_5 = v_4 + v_3$, $2 - 2 pi$, $dash(v)_5 = dash(y)$, $1$,
+
+    $y_1 = v_5$, $2 - 2 pi$, $dash(y)$, $1$,
+  ),
+) <tab:evaluation_trace_partial_derivative>
 
 TODO: potřeba dva průchody - první k vytvoření výpočetního grafu a zpětný k
 tomu, abychom viděli jak který vstup kontributuje k výsledné hodnotě (kterou si
