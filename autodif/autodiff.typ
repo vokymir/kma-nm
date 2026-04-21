@@ -470,9 +470,6 @@ $
   pp(y, x) = pp(f(v_2), v_2) pp(g(v_1), v_1) pp(h(v_0), v_0)
 $ <eq:diff_decomposition>
 
-TODO: "jediný" rozdíl mezi FM/BM je pořadí derivací v chain rule - dá se
-vysvětlit i jako pořadí násobení jakobiánů
-
 To summarize, autodiff makes use of function (de)composition, chain rule and
 utilizes computational graph. Similarily to symbolic method it requires a set of
 known derivatives, although it does not need rules as it implicitely works with
@@ -976,8 +973,19 @@ these, we get:
 
 = Conclusion
 
-TODO: jak cca funguje autodif, k čemu je dobrá (výhody oproti FD a symbolic),
-důležitost pro reálné aplikace, limitace
+Automatic differentiation is a powerful alternative to formerly widely used
+finite differences and symbolic method. Its strength lies in avoiding
+approximation errors and expression swell, both drawbacks of mentioned methods.
+The core principle is systematic application of the chain rule on elementary
+operations.
+
+With mathematical foundation and simple implementation of both modes, this paper
+demonstrated how the method works. Forward method is intuitive, effective for
+functions with few inputs. Backward mode is well-suited for scalar-output
+problems, common in optimalization and machine learning.
+
+Overall, automatic differentiation is conceptually simple, computationally
+efficient and therefore essential for scientific computing.
 
 = Further reading
 
