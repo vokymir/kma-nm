@@ -253,13 +253,13 @@ valuable. The differences are summarized in @tab:comparison_fd_sym.
 
     table.header([*Property*], [*FD*], [*Symbolic*]),
 
-    [Accuracy], [approximation], [precise],
+    [*Accuracy*], [approximation], [exact],
 
-    [Cost], [$O(1)$], [higher],
+    [*Cost*], [$O(n)$], [high],
 
-    [Implementation], [easy], [harder],
+    [*Implementation*], [easy], [moderate],
 
-    [Disadvantages], [$h arrow 0$:unstable, \ $epsilon$-sensitive], [expression swell],
+    [*Disadvantages*], [$h arrow 0$:unstable, \ $epsilon$-sensitive], [expression swell],
   ),
 ) <tab:comparison_fd_sym>
 
@@ -701,7 +701,28 @@ beginning, we than get one row of jacobian matrix on every backward pass.
 
 == Computational complexity
 
-TODO: časová a paměťová komplexita, porovnání s ostatními metodami
+Now we can compare both modes of autodiff with previously known methods. We will
+base it on @tab:comparison_fd_sym.
+
+#figure(
+  caption: "Comparison between methods.",
+  table(
+    columns: 5,
+
+    table.header([*Property*], [*FD*], [*Sym*], [*AD (FM)*], [*AD (BM)*]),
+
+    [*Accuracy*], [approximation], [exact], [exact], [exact],
+
+    [*Cost*], [$O(n)$], [high], [moderate], [moderate],
+
+    [*Implementation*], [easy], [moderate], [moderate], [moderate],
+
+    [*Disadvantages*], [unstable], [expression swell], [memory overload], [control-flow complexity],
+  ),
+) <tab:comparison_with_ad>
+
+The main drawback for autodiff (especially backward mode) is the high memory
+usage. It needs to hold the computational graph which could be rather large.
 
 = Minimal implementation
 
