@@ -74,6 +74,7 @@
   $(partial #f) / (partial #x)$
 }
 
+#show raw.where(block: true): set text(0.86em)
 
 = Introduction
 
@@ -726,13 +727,77 @@ usage. It needs to hold the computational graph which could be rather large.
 
 = Minimal implementation
 
-TODO: jak dát do kódu, python - fundamentální rozdíl mezi FMode a BM
+Following sections demonstrate how could autodiff be naively implemented inside
+`python`. In implementation of both modes, the same example function is used as
+previously.
 
+#colbreak()
 == Forward mode
+#figure(
+  caption: "Forward mode autodiff naive implementation in python.",
+  ```py
+  import math
 
-TODO: + vysvětlení pomocí duálních čísel, přetížení standardních algebraických
-operací tak, aby se přenášela i derivace
+  class Variable:
 
+      def __init__(self, value, tangent):
+          self.value = value
+          self.tangent = tangent
+
+      def __add__(self, other):
+          value = self.value + other.value
+          tangent = self.tangent + other.tangent
+          return Variable(value, tangent)
+
+      def __sub__(self, other):
+          value = self.value - other.value
+          tangent = self.tangent - other.tangent
+          return Variable(value, tangent)
+
+      def __mul__(self, other):
+          value = self.value * other.value
+          tangent = self.tangent * other.value + \
+                    other.tangent * self.value
+          return Variable(value, tangent)
+
+      def __repr__(self):
+          return f"(value: {self.value}," \
+                 f" tangent: {self.tangent})"
+
+  # only works if x is of type Variable
+  def sin(x):
+      return Variable(
+              math.sin(x.value),
+              math.cos(x.value))
+
+  x1 = Variable(math.pi, 1.0)
+  x2 = Variable(2.0, 0.0)
+  y = sin(x1) - x1 * x2 + x2
+
+  print(f"{x1 = },\n{x2 = }")
+  print(f"{y = }")
+  ```,
+)
+
+In the code above can be seen the principle of forward mode: The function is
+evaluated and the partial is computed along at the same time.
+
+The program creates a new data type (`Variable`) and via functions determine how
+it responds to standard operators $(+,-,dot)$. The function for sinus is created
+in the same way. The function `__init__` explains python how to initialize the
+variable, `__repr__` tells it how to represent it in text.
+
+The output of this program is:
+```
+x1 = (value: 3.141592653589793, tangent: 1.0),
+x2 = (value: 2.0, tangent: 0.0)
+y = (value: -4.283185307179586, tangent: -3.0)
+```
+Which gives to show that these results are the same as ours previously ($2 - 2pi
+approx -4.28$). Note that we decided that the partial would be calculated with
+respect to $x_1$ simply by setting its tangent to $1$.
+
+#colbreak()
 == Backward mode
 
 TODO: + vysvětlení jak se používá computational graf k zpětnému chodu
