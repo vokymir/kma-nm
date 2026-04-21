@@ -981,8 +981,7 @@ důležitost pro reálné aplikace, limitace
 
 = Further reading
 
-TODO: list mých zdrojů s lepším popisem, pro ty, které by zajímalo víc
-
+For those interested in autodiff, I can recommend these sources:
 @enwiki:autodif
 @huggingface:autodif
 @dlsyscourse
