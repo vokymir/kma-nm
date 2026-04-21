@@ -683,6 +683,21 @@ $dash(v)_2$. While $dash(v)_3$ is trivial, the other variable displays new
 behaviour. When expanded: $dash(v)_2 dot pp(( v_(-1) v_0), v_0)$ we can see that
 it is only the result of product rule.
 
+If we were to write this down in jacobian matrix, we would get:
+
+$
+  JJ = mat(
+    delim: "[",
+    pp(y_1, x_1), pp(y_1, x_2);
+  )
+  = mat(
+    delim: "[",
+    -3",", 1-pi;
+  )
+$
+
+Where we can see, that in backward mode while we must do one forward pass on the
+beginning, we than get one row of jacobian matrix on every backward pass.
 
 == Computational complexity
 
