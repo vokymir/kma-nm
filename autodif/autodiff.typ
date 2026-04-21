@@ -582,7 +582,7 @@ recursive relation:
 
 $
   pp(y, v_i) = pp(y, v_(i+1)) pp(v_(i+1), v_i), quad v_0 = x
-$
+$ <eq:reverse_mode_recursive_formula>
 
 Which expanded looks like this:
 
@@ -617,17 +617,16 @@ have one output variable so it simplifies.
 $
   y = f(x_1, x_2) = sin(x_1) - x_1 x_2 + x_2 \
   x_1 = pi, quad x_2 = 2 \
-  dot(y) = 1
+  dot(y)_1 = 1
 $
 
 
 #figure(
-  caption: "Evaluation trace for reverse mode simple example partial
-  derivative.",
+  caption: "Evaluation trace for reverse mode.",
   table(
     columns: 4,
 
-    table.header([*(FW) Variable*], [*Value*], [*(RE) Adjoint*], [*Adjoint Value*]),
+    table.header([*#sym.arrow.b Variable*], [*Value*], [*#sym.arrow.t Adjoint*], [*Adjoint Value*]),
 
     $v_(-1) = x_1$,
     $pi$,
@@ -649,16 +648,40 @@ $
 
     $v_4 = v_1 - v_2$, $-2 pi$, $dash(v)_4 = dash(v)_5 dot 1$, $1 dot 1 = 1$,
 
-    $v_5 = v_4 + v_3$, $2 - 2 pi$, $dash(v)_5 = dash(y)$, $1$,
+    $v_5 = v_4 + v_3$, $2 - 2 pi$, $dash(v)_5 = dash(y)_1$, $1$,
 
-    $y_1 = v_5$, $2 - 2 pi$, $dash(y)$, $1$,
+    $y_1 = v_5$, $2 - 2 pi$, $dash(y)_1$, $1$,
   ),
-) <tab:evaluation_trace_partial_derivative>
+) <tab:evaluation_trace_partial_derivative_reverse_mode>
 
-TODO: potřeba dva průchody - první k vytvoření výpočetního grafu a zpětný k
-tomu, abychom viděli jak který vstup kontributuje k výsledné hodnotě (kterou si
-zvolíme) -> víc paměti. taky VJP (vector jacobian product) - a na tom ukázat,
-že je vhodné pro mnoho vstupů a málo výstupů (vs forward mode)
+The explanation of this example is necessary. After constructing the forward
+evaluation trace and computational graph (the two left columns, already
+calculated in previous examples), we start with the adjoint $dash(y)_1 = 1$.
+
+We must propagate the adjoint $dash(y)_1$ to all variables which caused it. In
+this case, only to $v_5$. This can be found in the table as $y_1 = v_5$ or in
+computational graph as all vertices pointing to $y_1$.
+
+The steps for $v_5$ are similar, except now the dependencies of it are $v_4,
+v_3$. This means we will add to both how much they contribute. For $dash(v)_4 =
+dash(v)_5 dot pp(v_4, v_4)$ using the recursive formula
+@eq:reverse_mode_recursive_formula. The $dash(v)_5$ is there, because $v_4$
+contributed to $v_5$. In the partial we are derivating $v_4$ with respect to
+$v_4$. The former comes from the equation $v_5 = v_4 + v_3$ where no additional
+functions are applied to it. The latter signifies that we are calculating the
+$dash(v)_5$ adjoint.
+
+We are essentially deducing how much every variable contributed to the one
+output variable we set to one. If one variable contributed more than once (in
+the computational graph have two or more arrows pointing outwards/right) we need
+to add all its contributions up. That applies to $v_0$ and $v_(-1)$. We will
+skip all the intermediate steps because they are very similar to that already
+seen.
+
+When calculating $dash(v)_0$, we must add its contribution from $dash(v)_3$ and
+$dash(v)_2$. While $dash(v)_3$ is trivial, the other variable displays new
+behaviour. When expanded: $dash(v)_2 dot pp(( v_(-1) v_0), v_0)$ we can see that
+it is only the result of product rule.
 
 
 == Computational complexity
