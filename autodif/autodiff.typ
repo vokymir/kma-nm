@@ -913,9 +913,66 @@ as adjoints of $x_1, x_2$. The other interesting thing is that in order to
 compute that, we needed to call `backawrd()` method on the `y` variable. That
 call started a recursive process which filled adjoints of all variables.
 
+#colbreak()
 = Using existing autodif libraries in python
 
-TODO: předpokládám python + pytorch, tensorFlow
+More realistic use of autodiff is via library. In this example we are using
+PyTorch for both forward and backward mode.
+
+#figure(
+  caption: "Autodiff using pytorch.",
+  ```py
+  import torch
+  from torch.func import jacfwd
+
+  # function: y = sin(x1) - x1*x2 + x2
+  def f(x):
+      x1, x2 = x
+      return torch.sin(x1) - x1 * x2 + x2
+
+  # input
+  x = torch.tensor([torch.pi, 2.0], requires_grad=True)
+
+  # FM
+  jac_fwd = jacfwd(f)(x)
+
+  # BM
+  y = f(x)
+  y.backward()
+  grad_rev = x.grad
+
+  print("FM:")
+  print(jac_fwd)
+
+  print("\nBM:")
+  print(grad_rev)py
+  ```,
+)
+
+We defined a function `f(x)` because pytorch requires function with only one
+variable input. That is why we _unpack_ it into `x1, x2` and use in the same
+function as previously. Then we prepare these under `# input`.
+
+For forward mode pytorch provides a function `jacfwd` (Jacobian using forward
+mode) which needs the function and the input variables. Similar to our
+implementation, but it does two passes to calculate both columns in the
+jacobian.
+
+For the backward mode we define the output variable `y`, call backward on it and
+we are interested in adjoints in `x`, which is stored as `x.grad`. When we print
+these, we get:
+
+#figure(
+  caption: "The output of PyTorch autodiff.",
+  ```
+  FM:
+  tensor([-3.0000, -2.1416], grad_fn=<ViewBackward0>)
+
+  BM:
+  tensor([-3.0000, -2.1416])
+  ```,
+)
+
 
 = Conclusion
 
