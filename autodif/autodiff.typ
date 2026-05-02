@@ -1000,3 +1000,6 @@ For those interested in autodiff, I can recommend these sources:
 @huggingface:autodif
 @dlsyscourse
 
+This seminar work with all its source code and working python examples is on
+#link("https://github.com/vokymir/kma-nm/tree/master/autodif")[github.com/vokymir/kma-nm/tree/master/autodif].
+
