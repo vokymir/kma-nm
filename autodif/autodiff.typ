@@ -19,6 +19,9 @@
   authors: (
     (
       name: "Jakub Vokoun",
+      department: [Faculty of Applied Sciences],
+      organization: [University of West Bohemia],
+      location: [Pilsen, Czech Republic],
     ),
   ),
   paper-size: "a4",
@@ -88,15 +91,15 @@ inner workings of differentiation first.
 
 Derivative may be defined as a limit, such as
 $
-  L = lim_(h arrow 0)( f(a + h) - f(a) ) / h
+  L = lim_(h arrow 0)( f(a + h) - f(a) ) / h ","
 $ <eq:derivative>
-where $f(x)$ is differentiable on an open interval containing point $a$, and if
-the limit $L$ exists. In principle, the derivative of any function (if exists)
-may be computed using this definition. However, since was discovered different
-approach. When a few simple functions have known derivatives, using them with a
-set of rules for obtaining derivatives of more complicated functions results in
-a different, simpler method. The process of finding a derivative is called
-differentiation.
+
+where the limit $L$ exists. In principle, the derivative of any function (if
+exists) may be computed using this definition. However, since was discovered
+different approach. When a few simple functions have known derivatives, using
+them with a set of rules for obtaining derivatives of more complicated functions
+results in a different, simpler method. The process of finding a derivative is
+called differentiation.
 
 For example, if we know the derivative of a polynomial
 $
@@ -662,9 +665,9 @@ computational graph as all vertices pointing to $y_1$.
 
 The steps for $v_5$ are similar, except now the dependencies of it are $v_4,
 v_3$. This means we will add to both how much they contribute. For $dash(v)_4 =
-dash(v)_5 dot pp(v_4, v_4)$ using the recursive formula
+dash(v)_5 dot pp(v_5, v_4)$ using the recursive formula
 @eq:reverse_mode_recursive_formula. The $dash(v)_5$ is there, because $v_4$
-contributed to $v_5$. In the partial we are derivating $v_4$ with respect to
+contributed to $v_5$. In the partial we are derivating $v_5$ with respect to
 $v_4$. The former comes from the equation $v_5 = v_4 + v_3$ where no additional
 functions are applied to it. The latter signifies that we are calculating the
 $dash(v)_5$ adjoint.
@@ -676,10 +679,13 @@ to add all its contributions up. That applies to $v_0$ and $v_(-1)$. We will
 skip all the intermediate steps because they are very similar to that already
 seen.
 
-When calculating $dash(v)_0$, we must add its contribution from $dash(v)_3$ and
-$dash(v)_2$. While $dash(v)_3$ is trivial, the other variable displays new
-behaviour. When expanded: $dash(v)_2 dot pp(( v_(-1) v_0), v_0)$ we can see that
-it is only the result of product rule.
+When calculating $dash(v)_0$ (which, in fact, is $dash(x)_2$, thus also
+$pp(y_1, x_2)$), we must add its
+contribution from $dash(v)_3$ and $dash(v)_2$. While $dash(v)_3$ is trivial, the
+other variable displays new behaviour. When expanded: $dash(v)_2 dot pp(
+  (
+    v_(-1) v_0), v_0
+)$ we can see that it is only the result of product rule.
 
 If we were to write this down in jacobian matrix, we would get:
 
